@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="钙计算器">
+    <title>每日钙摄入计算器</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <header class="header"><h1>🦴 每日钙摄入计算器</h1></header>
+        <div class="card profile-card"><div class="profile-row"><div class="profile-item"><label>性别</label><div class="toggle-group" id="sexToggle"><button class="toggle-btn active" data-value="female">女</button><button class="toggle-btn" data-value="male">男</button></div></div><div class="profile-item"><label>年龄</label><div class="toggle-group" id="ageToggle"><button class="toggle-btn" data-value="19-49">19-49岁</button><button class="toggle-btn active" data-value="50+">50岁以上</button></div></div></div></div>
+        <div class="card summary-card"><div class="ring-container"><svg class="progress-ring" viewBox="0 0 200 200"><circle class="ring-bg" cx="100" cy="100" r="85"/><circle class="ring-progress" id="progressRing" cx="100" cy="100" r="85"/></svg><div class="ring-text"><span class="ring-value" id="totalCalcium">0</span><span class="ring-unit">毫克</span></div></div><div class="stats-row"><div class="stat"><span class="stat-label">今日摄入</span><span class="stat-value" id="statIntake">0 mg</span></div><div class="stat"><span class="stat-label">每日推荐</span><span class="stat-value stat-recommend" id="statRecommend">1200 mg</span></div><div class="stat"><span class="stat-label">还需要</span><span class="stat-value stat-remaining" id="statRemaining">1200 mg</span></div></div></div>
+        <div class="card selected-card" id="selectedCard" style="display:none;"><div class="selected-header"><h3>🍽️ 今日已吃的食物</h3><button class="clear-btn" id="clearAllBtn">全部清除</button></div><div id="selectedList"></div></div>
+        <button class="add-btn" id="addFoodBtn">➕ 添加食物</button>
+        <div class="modal-overlay" id="modalOverlay"><div class="modal"><div class="modal-header"><h2>选择食物</h2><button class="modal-close" id="modalClose">完成</button></div><div class="search-bar"><input type="text" id="searchInput" placeholder="🔍 搜索食物（中文或英文）"></div><div class="category-bar" id="categoryBar"><button class="cat-btn active" data-cat="milk">🥛 奶制品</button><button class="cat-btn" data-cat="fruitVeg">🥬 水果蔬菜</button><button class="cat-btn" data-cat="grains">🌾 谷物</button><button class="cat-btn" data-cat="legumes">🫘 豆类</button><button class="cat-btn" data-cat="protein">🐟 蛋白质</button><button class="cat-btn" data-cat="other">🍴 其他</button></div><div class="food-list" id="foodList"></div></div></div>
+    </div>
+    <script src="food-data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
