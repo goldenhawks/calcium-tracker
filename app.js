@@ -1,7 +1,20 @@
 let selectedFoods = [];
 let currentCategory = 'milk';
-let recommendedCalcium = 1200;
+let recommendedCalcium = 1000;
 let idCounter = 0;
+
+// 官方每日推荐钙摄入量（Health Canada / Osteoporosis Canada DRI）
+// 19-50岁：男女均 1000mg；51-70岁：女性 1200mg、男性 1000mg；71岁以上：男女均 1200mg
+function computeRecommended(sex, age) {
+    if (age === '19-50') return 1000;
+    if (age === '71+') return 1200;
+    return sex === 'female' ? 1200 : 1000;
+}
+function refreshRecommended() {
+    const sex = document.querySelector('#sexToggle .toggle-btn.active') ? document.querySelector('#sexToggle .toggle-btn.active').dataset.value : 'female';
+    const age = document.querySelector('#ageToggle .toggle-btn.active') ? document.querySelector('#ageToggle .toggle-btn.active').dataset.value : '19-50';
+    recommendedCalcium = computeRecommended(sex, age);
+}
 
 const totalCalciumEl = document.getElementById('totalCalcium');
 const progressRing = document.getElementById('progressRing');
@@ -21,6 +34,8 @@ function init() {
         if (!btn) return;
         document.querySelectorAll('#sexToggle .toggle-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
+        refreshRecommended();
+        updateDisplay();
         saveState();
     });
     document.getElementById('ageToggle').addEventListener('click', e => {
@@ -28,7 +43,7 @@ function init() {
         if (!btn) return;
         document.querySelectorAll('#ageToggle .toggle-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        recommendedCalcium = btn.dataset.value === '50+' ? 1200 : 1000;
+        refreshRecommended();
         updateDisplay();
         saveState();
     });
@@ -58,6 +73,7 @@ function init() {
         renderFoodList();
         saveState();
     });
+    refreshRecommended();
     updateDisplay();
 }
 
@@ -131,7 +147,7 @@ function formatServings(value) {
 }
 
 function saveState() {
-    const state = { selectedFoods: selectedFoods.map(s => ({ category: s.category, cn: s.food.cn, servings: s.servings })), recommendedCalcium, sex: document.querySelector('#sexToggle .toggle-btn.active')?.dataset.value, age: document.querySelector('#ageToggle .toggle-btn.active')?.dataset.value, date: new Date().toDateString(), idCounter };
+    const state = { selectedFoods: selectedFoods.map(s => ({ category: s.category, cn: s.food.cn, servings: s.servings })), recommendedCalcium, sex: document.querySelector('#sexToggle .toggle-btn.active') ? document.querySelector('#sexToggle .toggle-btn.active').dataset.value : null, age: document.querySelector('#ageToggle .toggle-btn.active') ? document.querySelector('#ageToggle .toggle-btn.active').dataset.value : null, date: new Date().toDateString(), idCounter };
     try { localStorage.setItem('calcium_tracker', JSON.stringify(state)); } catch(e) {}
 }
 
@@ -142,7 +158,8 @@ function loadState() {
         const state = JSON.parse(raw);
         if (state.date !== new Date().toDateString()) { localStorage.removeItem('calcium_tracker'); return; }
         if (state.sex) { document.querySelectorAll('#sexToggle .toggle-btn').forEach(b => { b.classList.toggle('active', b.dataset.value === state.sex); }); }
-        if (state.age) { document.querySelectorAll('#ageToggle .toggle-btn').forEach(b => { b.classList.toggle('active', b.dataset.value === state.age); }); recommendedCalcium = state.age === '50+' ? 1200 : 1000; }
+        const validAges = ['19-50', '51-70', '71+'];
+        if (state.age && validAges.includes(state.age)) { document.querySelectorAll('#ageToggle .toggle-btn').forEach(b => { b.classList.toggle('active', b.dataset.value === state.age); }); }
         if (state.idCounter) idCounter = state.idCounter;
         if (state.selectedFoods) { state.selectedFoods.forEach(saved => { const catFoods = FOOD_DATA[saved.category]; if (!catFoods) return; const food = catFoods.find(f => f.cn === saved.cn); if (!food) return; selectedFoods.push({ food, servings: saved.servings, category: saved.category, id: 'f' + (++idCounter) }); }); }
     } catch(e) {}
